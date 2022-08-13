@@ -83,7 +83,7 @@ class MainViewController: UIViewController {
             tableView.widthAnchor.constraint(equalTo: view.widthAnchor),
             tableView.heightAnchor.constraint(equalToConstant: 350),
             
-//            stackView.topAnchor.constraint(equalTo: tableView.bottomAnchor)
+//            stackView.topAnchor.constraint(equalTo: tableView.bottomAnchor) test
         ])
         
     }
