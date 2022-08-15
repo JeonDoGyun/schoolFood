@@ -33,9 +33,11 @@ class CustomTableViewCell: UITableViewCell {
         mySubTitle.translatesAutoresizingMaskIntoConstraints = false
         
         countLabel.font = .systemFont(ofSize: 15)
+        countLabel.text = "0개"
         countLabel.translatesAutoresizingMaskIntoConstraints = false
         
         myStepper.translatesAutoresizingMaskIntoConstraints = false
+        myStepper.addTarget(self, action: #selector(didTapStepper(_:)), for: .valueChanged)
         
         NSLayoutConstraint.activate([
             myImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -58,6 +60,13 @@ class CustomTableViewCell: UITableViewCell {
         ])
         
     }
+    
+    @objc
+    private func didTapStepper(_ sender: UIStepper) {
+        let counts = Int(sender.value)
+        countLabel.text = String(counts) + "개"
+    }
+    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

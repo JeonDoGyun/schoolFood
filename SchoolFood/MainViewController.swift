@@ -20,8 +20,6 @@ class MainViewController: UIViewController {
     let foodPrices = ["7500원", "8500원", "8000원", "9000원"]
     let foodImages = ["specailmari", "bibimbap", "jjolmyeon", "tteokbokki"]
     
-    let foodCounts = [0, 0, 0, 0]
-    
     let stackView = UIStackView()
        
     func printImage(){
@@ -65,6 +63,7 @@ class MainViewController: UIViewController {
         stackView.distribution = .fill
         stackView.backgroundColor = .red
         
+        
         NSLayoutConstraint.activate([
             leftButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             leftButton.centerYAnchor.constraint(equalTo: titleImageView.centerYAnchor),
@@ -83,20 +82,52 @@ class MainViewController: UIViewController {
             tableView.widthAnchor.constraint(equalTo: view.widthAnchor),
             tableView.heightAnchor.constraint(equalToConstant: 350),
             
-//            stackView.topAnchor.constraint(equalTo: tableView.bottomAnchor) test
+//            stackView.topAnchor.constraint(equalTo: tableView.bottomAnchor)
         ])
         
     }
     
     @objc
     private func didTapLeftButton(_ sender: UIButton) {
-        print(#function)
+        let alertController = UIAlertController(title: "지갑", message: "얼마를 충전할까요?", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+        let confirmAction = UIAlertAction(title: "확인", style: .default)
+        alertController.addAction(cancelAction)
+        alertController.addAction(confirmAction)
+        present(alertController, animated: true)
     }
 
     @objc
     private func didTapRightButton(_ sender: UIButton) {
-        print(#function)
+        // 1
+        let alertController1 = UIAlertController(title: "상품 없음", message: "먼저 상품을 추가하세요.", preferredStyle: .alert)
+        let confirmAction1 = UIAlertAction(title: "확인", style: .default)
+        alertController1.addAction(confirmAction1)
+        present(alertController1, animated: true)
+        
+        // 2
+        let alertController2 = UIAlertController(title: "잔액부족", message: "??원이 부족합니다.", preferredStyle: .alert)
+        let confirmAction2 = UIAlertAction(title: "확인", style: .default)
+        alertController2.addAction(confirmAction2)
+        present(alertController2, animated: true)
+        // 3
+        let alertController3 = UIAlertController(title: "결제", message: "총 ??원을 결제하시겠습니까?", preferredStyle: .alert)
+        let cancelAction3 = UIAlertAction(title: "취소", style: .cancel)
+        let confirmAction3 = UIAlertAction(title: "확인", style: .default)
+        alertController3.addAction(cancelAction3)
+        alertController3.addAction(confirmAction3)
+        present(alertController3, animated: true)
+        
+//        if { test
+//            present(alertController1, animated: true)
+//        } else if {
+//            present(alertController2, animated: true)
+//        } else {
+//            present(alertController3, animated: true)
+//        }
     }
+    
+    
 
 }
 
@@ -113,13 +144,11 @@ extension MainViewController: UITableViewDataSource {
         cell.mySubTitle.text = foodPrices[indexPath.row]
         cell.mySubTitle.sizeToFit()
         
-        cell.countLabel.text = String(foodCounts[indexPath.row]) + "개"
-        cell.countLabel.sizeToFit()
-        
         cell.myImageView.image = UIImage(named: foodImages[indexPath.row])
         
         cell.selectionStyle = .none
         return cell
+        
     }
     
 }
