@@ -12,7 +12,7 @@ class MainViewController: UIViewController {
         
     let tableView = UITableView()
     
-    let image = UIImage(named: "logo")
+    let titleImageView = UIImageView(image: UIImage(named: "logo"))
     
     let leftButton = UIButton(type: .system) // 충전
     let rightButton = UIButton(type: .system) // 결제
@@ -20,7 +20,6 @@ class MainViewController: UIViewController {
     let foodMenus = ["스페셜 마리", "불맛 중화비빔밥", "어간장 육감쫄면", "의성 마늘떡볶이"]
     let foodPrices = [7500, 8500, 8000, 9000]
     let foodImages = ["specailmari", "bibimbap", "jjolmyeon", "tteokbokki"]
-    let counts = ["0개", "0개", "0개", "0개"]
     
     let stackView = UIStackView()
     let walletLabel = UILabel()
@@ -28,22 +27,19 @@ class MainViewController: UIViewController {
     
     let clearButton = UIButton()
     
-    var nowMoney = 10000
-    var calculatedMoney = 100
+    var nowMoney = 0
+    var calculatedMoney = 0
     
+    let numberFormatter = NumberFormatter()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = .decimal
-        
-        for foodPrice in foodPrices {
-            numberFormatter.string(for: foodPrice)
-        }
 
-        let titleImageView = UIImageView(image: image)
-        
+        style()
+        layout()
+    }
+    
+    func style() {
         view.addSubview(leftButton)
         view.addSubview(titleImageView)
         view.addSubview(rightButton)
@@ -59,21 +55,12 @@ class MainViewController: UIViewController {
         rightButton.backgroundColor = .white
         rightButton.addTarget(self, action: #selector(didTapRightButton(_:)), for: .touchUpInside)
         
-        leftButton.translatesAutoresizingMaskIntoConstraints = false
-        titleImageView.translatesAutoresizingMaskIntoConstraints = false
-        rightButton.translatesAutoresizingMaskIntoConstraints = false
-        clearButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.dataSource = self
         tableView.rowHeight = 70
         
-        stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(walletLabel)
         stackView.addArrangedSubview(paymentLabel)
-        walletLabel.text = "내 지갑:           \(nowMoney)원"
-        paymentLabel.text = "최종 결제금액:           \(calculatedMoney)원"
         stackView.axis = .vertical
         stackView.alignment = .trailing
         stackView.distribution = .fillEqually
@@ -82,6 +69,24 @@ class MainViewController: UIViewController {
         clearButton.addTarget(self, action: #selector(didTapClearButton(_:)), for: .touchUpInside)
         clearButton.setTitleColor(.red, for: .normal)
         clearButton.sizeToFit()
+        
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.string(for: nowMoney)
+        
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.string(for: calculatedMoney)
+        
+        walletLabel.text = "내 지갑:           \(nowMoney)원"
+        paymentLabel.text = "최종 결제금액:           \(calculatedMoney)원"
+    }
+    
+    func layout() {
+        leftButton.translatesAutoresizingMaskIntoConstraints = false
+        titleImageView.translatesAutoresizingMaskIntoConstraints = false
+        rightButton.translatesAutoresizingMaskIntoConstraints = false
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        clearButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             leftButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -109,7 +114,7 @@ class MainViewController: UIViewController {
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             stackView.bottomAnchor.constraint(equalTo: clearButton.topAnchor, constant: -150)
         ])
-        
+
     }
     
     @objc
@@ -119,7 +124,8 @@ class MainViewController: UIViewController {
         let confirmAction = UIAlertAction(title: "확인", style: .default, handler: {_ in
             guard let myWallet = Int((alertController.textFields?.first?.text)!) else { return }
             self.nowMoney += myWallet
-            self.walletLabel.text = "내 지갑:           \(self.nowMoney)원"
+            guard let money = self.numberFormatter.string(for: self.nowMoney) else { return }
+            self.walletLabel.text = "내 지갑:           \(money)원"
         })
         alertController.addTextField(configurationHandler: { textfield in
             textfield.keyboardType = .numberPad
@@ -150,7 +156,8 @@ class MainViewController: UIViewController {
             let confirmAction3 = UIAlertAction(title: "확인", style: .default, handler: {_ in 
                 self.nowMoney = charge
                 self.calculatedMoney = 0
-                self.walletLabel.text = "내 지갑:           \(self.nowMoney)원"
+                guard let money = self.numberFormatter.string(for: self.nowMoney) else { return }
+                self.walletLabel.text = "내 지갑:           \(money)원"
                 self.paymentLabel.text = "최종 결제금액:           \(self.calculatedMoney)원"
             })
             alertController3.addAction(cancelAction3)
@@ -161,11 +168,11 @@ class MainViewController: UIViewController {
     
     @objc
     func didTapClearButton(_ sender: UIButton) {
-        print(#function)
-        
+        nowMoney = 0
+        calculatedMoney = 0
+        walletLabel.text = "내 지갑:           \(nowMoney)원"
+        paymentLabel.text = "최종 결제금액:           \(calculatedMoney)원"
     }
-    
-    
 }
 
 extension MainViewController: UITableViewDataSource {
@@ -178,15 +185,17 @@ extension MainViewController: UITableViewDataSource {
         cell.myTitle.text = foodMenus[indexPath.row]
         cell.myTitle.sizeToFit()
         
-        cell.mySubTitle.text = String(foodPrices[indexPath.row]) + "원"
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        
+        cell.mySubTitle.text = (numberFormatter.string(for: foodPrices[indexPath.row]) ?? "0") + "원"
         cell.mySubTitle.sizeToFit()
         
         cell.myImageView.image = UIImage(named: foodImages[indexPath.row])
 
         cell.selectionStyle = .none
-    
-        return cell
         
+        return cell
         
     }
     

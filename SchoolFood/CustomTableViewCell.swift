@@ -14,7 +14,7 @@ class CustomTableViewCell: UITableViewCell {
     let myImageView = UIImageView()
     let countLabel = UILabel()
     let myStepper = UIStepper()
-        
+            
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.addSubview(myTitle)
@@ -58,6 +58,8 @@ class CustomTableViewCell: UITableViewCell {
             myStepper.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
         ])
+        
+       
         
     }
     
