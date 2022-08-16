@@ -6,9 +6,10 @@
 //
 
 import UIKit
+import Foundation
 
 class MainViewController: UIViewController {
-    
+        
     let tableView = UITableView()
     
     let image = UIImage(named: "logo")
@@ -17,29 +18,38 @@ class MainViewController: UIViewController {
     let rightButton = UIButton(type: .system) // 결제
     
     let foodMenus = ["스페셜 마리", "불맛 중화비빔밥", "어간장 육감쫄면", "의성 마늘떡볶이"]
-    let foodPrices = ["7500원", "8500원", "8000원", "9000원"]
+    let foodPrices = [7500, 8500, 8000, 9000]
     let foodImages = ["specailmari", "bibimbap", "jjolmyeon", "tteokbokki"]
+    let counts = ["0개", "0개", "0개", "0개"]
     
     let stackView = UIStackView()
-       
-    func printImage(){
-        for foodImage in foodImages {
-            print(foodImage)
-        }
-    }
+    let walletLabel = UILabel()
+    let paymentLabel = UILabel()
+    
+    let clearButton = UIButton()
+    
+    var nowMoney = 10000
+    var calculatedMoney = 100
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        
+        for foodPrice in foodPrices {
+            numberFormatter.string(for: foodPrice)
+        }
 
         let titleImageView = UIImageView(image: image)
-//        let walletView = stackView.arrangedSubviews[0]
-//        let wasteView = stackView.arrangedSubviews[1]
         
         view.addSubview(leftButton)
         view.addSubview(titleImageView)
         view.addSubview(rightButton)
         view.addSubview(tableView)
         view.addSubview(stackView)
+        view.addSubview(clearButton)
         
         leftButton.setTitle("충전", for: .normal)
         leftButton.backgroundColor = .white
@@ -52,17 +62,26 @@ class MainViewController: UIViewController {
         leftButton.translatesAutoresizingMaskIntoConstraints = false
         titleImageView.translatesAutoresizingMaskIntoConstraints = false
         rightButton.translatesAutoresizingMaskIntoConstraints = false
+        clearButton.translatesAutoresizingMaskIntoConstraints = false
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.dataSource = self
         tableView.rowHeight = 70
         
-        stackView.axis = .horizontal
-        stackView.alignment = .fill
-        stackView.distribution = .fill
-        stackView.backgroundColor = .red
-        
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.addArrangedSubview(walletLabel)
+        stackView.addArrangedSubview(paymentLabel)
+        walletLabel.text = "내 지갑:           \(nowMoney)원"
+        paymentLabel.text = "최종 결제금액:           \(calculatedMoney)원"
+        stackView.axis = .vertical
+        stackView.alignment = .trailing
+        stackView.distribution = .fillEqually
+                
+        clearButton.setTitle("초기화", for: .normal)
+        clearButton.addTarget(self, action: #selector(didTapClearButton(_:)), for: .touchUpInside)
+        clearButton.setTitleColor(.red, for: .normal)
+        clearButton.sizeToFit()
         
         NSLayoutConstraint.activate([
             leftButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -82,7 +101,13 @@ class MainViewController: UIViewController {
             tableView.widthAnchor.constraint(equalTo: view.widthAnchor),
             tableView.heightAnchor.constraint(equalToConstant: 350),
             
-//            stackView.topAnchor.constraint(equalTo: tableView.bottomAnchor)
+            clearButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            clearButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
+            
+            stackView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 80),
+            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            stackView.bottomAnchor.constraint(equalTo: clearButton.topAnchor, constant: -150)
         ])
         
     }
@@ -91,7 +116,14 @@ class MainViewController: UIViewController {
     private func didTapLeftButton(_ sender: UIButton) {
         let alertController = UIAlertController(title: "지갑", message: "얼마를 충전할까요?", preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "취소", style: .cancel)
-        let confirmAction = UIAlertAction(title: "확인", style: .default)
+        let confirmAction = UIAlertAction(title: "확인", style: .default, handler: {_ in
+            guard let myWallet = Int((alertController.textFields?.first?.text)!) else { return }
+            self.nowMoney += myWallet
+            self.walletLabel.text = "내 지갑:           \(self.nowMoney)원"
+        })
+        alertController.addTextField(configurationHandler: { textfield in
+            textfield.keyboardType = .numberPad
+        })
         alertController.addAction(cancelAction)
         alertController.addAction(confirmAction)
         present(alertController, animated: true)
@@ -99,36 +131,41 @@ class MainViewController: UIViewController {
 
     @objc
     private func didTapRightButton(_ sender: UIButton) {
-        // 1
-        let alertController1 = UIAlertController(title: "상품 없음", message: "먼저 상품을 추가하세요.", preferredStyle: .alert)
-        let confirmAction1 = UIAlertAction(title: "확인", style: .default)
-        alertController1.addAction(confirmAction1)
-        present(alertController1, animated: true)
+        let charge = nowMoney - calculatedMoney
+        let lackedMoney = calculatedMoney - nowMoney
         
-        // 2
-        let alertController2 = UIAlertController(title: "잔액부족", message: "??원이 부족합니다.", preferredStyle: .alert)
-        let confirmAction2 = UIAlertAction(title: "확인", style: .default)
-        alertController2.addAction(confirmAction2)
-        present(alertController2, animated: true)
-        // 3
-        let alertController3 = UIAlertController(title: "결제", message: "총 ??원을 결제하시겠습니까?", preferredStyle: .alert)
-        let cancelAction3 = UIAlertAction(title: "취소", style: .cancel)
-        let confirmAction3 = UIAlertAction(title: "확인", style: .default)
-        alertController3.addAction(cancelAction3)
-        alertController3.addAction(confirmAction3)
-        present(alertController3, animated: true)
+        if nowMoney == 0 && calculatedMoney == 0 {
+            let alertController1 = UIAlertController(title: "상품 없음", message: "먼저 상품을 추가하세요.", preferredStyle: .alert)
+            let confirmAction1 = UIAlertAction(title: "확인", style: .default)
+            alertController1.addAction(confirmAction1)
+            present(alertController1, animated: true)
+        } else if nowMoney < calculatedMoney {
+            let alertController2 = UIAlertController(title: "잔액부족", message: "\(lackedMoney)원이 부족합니다.", preferredStyle: .alert)
+            let confirmAction2 = UIAlertAction(title: "확인", style: .default)
+            alertController2.addAction(confirmAction2)
+            present(alertController2, animated: true)
+        } else {
+            let alertController3 = UIAlertController(title: "결제", message: "총 \(nowMoney)원을 결제하시겠습니까?", preferredStyle: .alert)
+            let cancelAction3 = UIAlertAction(title: "취소", style: .cancel)
+            let confirmAction3 = UIAlertAction(title: "확인", style: .default, handler: {_ in 
+                self.nowMoney = charge
+                self.calculatedMoney = 0
+                self.walletLabel.text = "내 지갑:           \(self.nowMoney)원"
+                self.paymentLabel.text = "최종 결제금액:           \(self.calculatedMoney)원"
+            })
+            alertController3.addAction(cancelAction3)
+            alertController3.addAction(confirmAction3)
+            present(alertController3, animated: true)
+        }
+    }
+    
+    @objc
+    func didTapClearButton(_ sender: UIButton) {
+        print(#function)
         
-//        if { test
-//            present(alertController1, animated: true)
-//        } else if {
-//            present(alertController2, animated: true)
-//        } else {
-//            present(alertController3, animated: true)
-//        }
     }
     
     
-
 }
 
 extension MainViewController: UITableViewDataSource {
@@ -141,13 +178,15 @@ extension MainViewController: UITableViewDataSource {
         cell.myTitle.text = foodMenus[indexPath.row]
         cell.myTitle.sizeToFit()
         
-        cell.mySubTitle.text = foodPrices[indexPath.row]
+        cell.mySubTitle.text = String(foodPrices[indexPath.row]) + "원"
         cell.mySubTitle.sizeToFit()
         
         cell.myImageView.image = UIImage(named: foodImages[indexPath.row])
-        
+
         cell.selectionStyle = .none
+    
         return cell
+        
         
     }
     
