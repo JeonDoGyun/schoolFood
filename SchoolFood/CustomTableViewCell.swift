@@ -14,6 +14,8 @@ class CustomTableViewCell: UITableViewCell {
     let myImageView = UIImageView()
     let countLabel = UILabel()
     let myStepper = UIStepper()
+    
+    let foodPrices = [7500, 8500, 8000, 9000]
             
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -59,14 +61,13 @@ class CustomTableViewCell: UITableViewCell {
             
         ])
         
-       
-        
     }
     
     @objc
     private func didTapStepper(_ sender: UIStepper) {
         let counts = Int(sender.value)
         countLabel.text = String(counts) + "개"
+        
     }
     
     

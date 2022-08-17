@@ -28,6 +28,11 @@ class MainViewController: UIViewController {
     let clearButton = UIButton()
     
     var nowMoney = 0
+//    {    집 가서 넣어보기
+//        willSet {
+//
+//        }
+//    }
     var calculatedMoney = 0
     
     let numberFormatter = NumberFormatter()
@@ -138,7 +143,7 @@ class MainViewController: UIViewController {
     @objc
     private func didTapRightButton(_ sender: UIButton) {
         let charge = nowMoney - calculatedMoney
-        let lackedMoney = calculatedMoney - nowMoney
+        let balance = calculatedMoney - nowMoney
         
         if nowMoney == 0 && calculatedMoney == 0 {
             let alertController1 = UIAlertController(title: "상품 없음", message: "먼저 상품을 추가하세요.", preferredStyle: .alert)
@@ -146,7 +151,7 @@ class MainViewController: UIViewController {
             alertController1.addAction(confirmAction1)
             present(alertController1, animated: true)
         } else if nowMoney < calculatedMoney {
-            let alertController2 = UIAlertController(title: "잔액부족", message: "\(lackedMoney)원이 부족합니다.", preferredStyle: .alert)
+            let alertController2 = UIAlertController(title: "잔액부족", message: "\(balance)원이 부족합니다.", preferredStyle: .alert)
             let confirmAction2 = UIAlertAction(title: "확인", style: .default)
             alertController2.addAction(confirmAction2)
             present(alertController2, animated: true)
@@ -196,7 +201,6 @@ extension MainViewController: UITableViewDataSource {
         cell.selectionStyle = .none
         
         return cell
-        
     }
     
 }
