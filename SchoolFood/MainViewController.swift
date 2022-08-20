@@ -155,7 +155,7 @@ class MainViewController: UIViewController {
             alertController2.addAction(confirmAction2)
             present(alertController2, animated: true)
         } else {
-            let alertController3 = UIAlertController(title: "결제", message: "총 \(nowMoney)원을 결제하시겠습니까?", preferredStyle: .alert)
+            let alertController3 = UIAlertController(title: "결제", message: "총 \(calculatedMoney)원을 결제하시겠습니까?", preferredStyle: .alert)
             let cancelAction3 = UIAlertAction(title: "취소", style: .cancel)
             let confirmAction3 = UIAlertAction(title: "확인", style: .default, handler: {_ in 
                 self.nowMoney = charge
