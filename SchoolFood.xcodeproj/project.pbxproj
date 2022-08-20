@@ -12,6 +12,7 @@
 		EF63650C28A406FB00DBC574 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF63650B28A406FB00DBC574 /* MainViewController.swift */; };
 		EF63651128A406FB00DBC574 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF63651028A406FB00DBC574 /* Assets.xcassets */; };
 		EF63651428A406FB00DBC574 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF63651228A406FB00DBC574 /* LaunchScreen.storyboard */; };
+		EF8E17AA28B153280039ECCB /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8E17A928B153280039ECCB /* Menu.swift */; };
 		EFB40E3B28A7B09700AAE1B5 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB40E3A28A7B09700AAE1B5 /* CustomTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +24,7 @@
 		EF63651028A406FB00DBC574 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EF63651328A406FB00DBC574 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		EF63651528A406FB00DBC574 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EF8E17A928B153280039ECCB /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
 		EFB40E3A28A7B09700AAE1B5 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -56,6 +58,7 @@
 		EF63650628A406FB00DBC574 /* SchoolFood */ = {
 			isa = PBXGroup;
 			children = (
+				EF8E17A928B153280039ECCB /* Menu.swift */,
 				EF63650728A406FB00DBC574 /* AppDelegate.swift */,
 				EF63650928A406FB00DBC574 /* SceneDelegate.swift */,
 				EF63650B28A406FB00DBC574 /* MainViewController.swift */,
@@ -137,6 +140,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EF8E17AA28B153280039ECCB /* Menu.swift in Sources */,
 				EF63650C28A406FB00DBC574 /* MainViewController.swift in Sources */,
 				EF63650828A406FB00DBC574 /* AppDelegate.swift in Sources */,
 				EFB40E3B28A7B09700AAE1B5 /* CustomTableViewCell.swift in Sources */,

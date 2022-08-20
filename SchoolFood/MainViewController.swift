@@ -17,9 +17,7 @@ class MainViewController: UIViewController {
     let leftButton = UIButton(type: .system) // 충전
     let rightButton = UIButton(type: .system) // 결제
     
-    let foodMenus = ["스페셜 마리", "불맛 중화비빔밥", "어간장 육감쫄면", "의성 마늘떡볶이"]
-    let foodPrices = [7500, 8500, 8000, 9000]
-    let foodImages = ["specailmari", "bibimbap", "jjolmyeon", "tteokbokki"]
+    var quantities = [0, 0, 0, 0]
     
     let stackView = UIStackView()
     let walletLabel = UILabel()
@@ -27,16 +25,18 @@ class MainViewController: UIViewController {
     
     let clearButton = UIButton()
     
-    var nowMoney = 0
-//    {    집 가서 넣어보기
-//        willSet {
-//
-//        }
-//    }
-    var calculatedMoney = 0
-    
-    let numberFormatter = NumberFormatter()
+    var nowMoney = 0 {
+        willSet {
+            walletLabel.text = "내 지갑:       \(newValue.toDecimalFormat())원"
+        }
+    }
 
+    var calculatedMoney = 0 {
+        willSet {
+            paymentLabel.text = "최종 결제금액:   \(newValue.toDecimalFormat())원"
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -75,12 +75,6 @@ class MainViewController: UIViewController {
         clearButton.setTitleColor(.red, for: .normal)
         clearButton.sizeToFit()
         
-        numberFormatter.numberStyle = .decimal
-        numberFormatter.string(for: nowMoney)
-        
-        numberFormatter.numberStyle = .decimal
-        numberFormatter.string(for: calculatedMoney)
-        
         walletLabel.text = "내 지갑:           \(nowMoney)원"
         paymentLabel.text = "최종 결제금액:           \(calculatedMoney)원"
     }
@@ -117,9 +111,16 @@ class MainViewController: UIViewController {
             stackView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 80),
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: clearButton.topAnchor, constant: -150)
+            stackView.bottomAnchor.constraint(equalTo: clearButton.topAnchor, constant: -150),
         ])
 
+    }
+    
+    func resetAll() {
+        nowMoney = 0
+        calculatedMoney = 0
+        quantities = [0, 0, 0, 0]
+        tableView.reloadData()
     }
     
     @objc
@@ -129,8 +130,6 @@ class MainViewController: UIViewController {
         let confirmAction = UIAlertAction(title: "확인", style: .default, handler: {_ in
             guard let myWallet = Int((alertController.textFields?.first?.text)!) else { return }
             self.nowMoney += myWallet
-            guard let money = self.numberFormatter.string(for: self.nowMoney) else { return }
-            self.walletLabel.text = "내 지갑:           \(money)원"
         })
         alertController.addTextField(configurationHandler: { textfield in
             textfield.keyboardType = .numberPad
@@ -151,7 +150,7 @@ class MainViewController: UIViewController {
             alertController1.addAction(confirmAction1)
             present(alertController1, animated: true)
         } else if nowMoney < calculatedMoney {
-            let alertController2 = UIAlertController(title: "잔액부족", message: "\(balance)원이 부족합니다.", preferredStyle: .alert)
+            let alertController2 = UIAlertController(title: "잔액부족", message: "\(balance.toDecimalFormat())원이 부족합니다.", preferredStyle: .alert)
             let confirmAction2 = UIAlertAction(title: "확인", style: .default)
             alertController2.addAction(confirmAction2)
             present(alertController2, animated: true)
@@ -161,9 +160,8 @@ class MainViewController: UIViewController {
             let confirmAction3 = UIAlertAction(title: "확인", style: .default, handler: {_ in 
                 self.nowMoney = charge
                 self.calculatedMoney = 0
-                guard let money = self.numberFormatter.string(for: self.nowMoney) else { return }
-                self.walletLabel.text = "내 지갑:           \(money)원"
-                self.paymentLabel.text = "최종 결제금액:           \(self.calculatedMoney)원"
+                self.resetAll()
+                self.nowMoney = charge
             })
             alertController3.addAction(cancelAction3)
             alertController3.addAction(confirmAction3)
@@ -173,34 +171,43 @@ class MainViewController: UIViewController {
     
     @objc
     func didTapClearButton(_ sender: UIButton) {
-        nowMoney = 0
-        calculatedMoney = 0
-        walletLabel.text = "내 지갑:           \(nowMoney)원"
-        paymentLabel.text = "최종 결제금액:           \(calculatedMoney)원"
+        resetAll()
     }
 }
 
 extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return foodMenus.count
+        return Menu.allCases.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? CustomTableViewCell else { fatalError() }
         
-        cell.myTitle.text = foodMenus[indexPath.row]
-        cell.myTitle.sizeToFit()
-        
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = .decimal
-        
-        cell.mySubTitle.text = (numberFormatter.string(for: foodPrices[indexPath.row]) ?? "0") + "원"
-        cell.mySubTitle.sizeToFit()
-        
-        cell.myImageView.image = UIImage(named: foodImages[indexPath.row])
-
+        let menu = Menu.allCases[indexPath.row]
+        let quantity = quantities[indexPath.row]
+        cell.tag = indexPath.row
+        cell.setData(menu: menu, quantity: quantity)
         cell.selectionStyle = .none
+        cell.delegate = self
         
         return cell
     }
     
+}
+
+extension MainViewController: CustomTableViewCellDelegate {
+    func didTapStepper(amount: Int, quantity: Int, tag: Int) {
+        quantities[tag] = quantity
+        calculatedMoney += amount
+    }
+    
+}
+
+extension Int {
+    func toDecimalFormat() -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        guard let price = formatter.string(for: self) else { return "Error"}
+        
+        return price
+    }
 }

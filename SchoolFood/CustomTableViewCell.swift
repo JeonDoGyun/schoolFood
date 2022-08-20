@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol CustomTableViewCellDelegate: AnyObject {
+    func didTapStepper(amount: Int, quantity: Int, tag: Int)
+}
+
 class CustomTableViewCell: UITableViewCell {
     
     let myTitle = UILabel()
@@ -15,7 +19,15 @@ class CustomTableViewCell: UITableViewCell {
     let countLabel = UILabel()
     let myStepper = UIStepper()
     
-    let foodPrices = [7500, 8500, 8000, 9000]
+    private var menu: Menu?
+    
+    weak var delegate: CustomTableViewCellDelegate?
+    
+    var quantity = 0 {
+        willSet {
+            countLabel.text = String(newValue) + "개"
+        }
+    }
             
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -35,8 +47,8 @@ class CustomTableViewCell: UITableViewCell {
         mySubTitle.translatesAutoresizingMaskIntoConstraints = false
         
         countLabel.font = .systemFont(ofSize: 15)
-        countLabel.text = "0개"
         countLabel.translatesAutoresizingMaskIntoConstraints = false
+        countLabel.text = String(quantity) + "개"
         
         myStepper.translatesAutoresizingMaskIntoConstraints = false
         myStepper.addTarget(self, action: #selector(didTapStepper(_:)), for: .valueChanged)
@@ -63,16 +75,25 @@ class CustomTableViewCell: UITableViewCell {
         
     }
     
-    @objc
-    private func didTapStepper(_ sender: UIStepper) {
-        let counts = Int(sender.value)
-        countLabel.text = String(counts) + "개"
-        
-    }
-    
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc
+    func didTapStepper(_ sender: UIStepper) {
+        guard let price = menu?.price else { return }
+        let amount = price * (Int(sender.value) - quantity)
+        quantity = Int(sender.value)
+        delegate?.didTapStepper(amount: amount, quantity: quantity, tag: tag)
+    }
+    
+    func setData(menu: Menu, quantity: Int) {
+        self.menu = menu
+        self.quantity = quantity
+        myStepper.value = Double(quantity)
+        myImageView.image = menu.image
+        myTitle.text = menu.title
+        mySubTitle.text = menu.priceTag
     }
     
 }
